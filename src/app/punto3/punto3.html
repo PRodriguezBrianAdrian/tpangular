@@ -1,0 +1,63 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-2">🃏 Juego de Memoria</h2>
+
+  <!-- Barra de estado -->
+  <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+    <span class="fs-5">
+      Intentos: <strong [class]="colorIntentos">{{ intentos }} / {{ intentosMax }}</strong>
+    </span>
+  </div>
+
+  <!-- Botones de control -->
+  <div class="d-flex justify-content-center gap-3 mb-4">
+    <button
+      class="btn btn-success btn-lg"
+      (click)="iniciarJuego()"
+      [disabled]="juegoIniciado && !juegoTerminado"
+    >
+      ▶ INICIAR
+    </button>
+    <button
+      class="btn btn-danger btn-lg"
+      (click)="reiniciarJuego()"
+    >
+      🔄 REINICIAR
+    </button>
+  </div>
+
+  <!-- Mensaje de estado final -->
+  <div
+    *ngIf="juegoTerminado"
+    class="alert text-center fs-5 fw-bold"
+    [class.alert-success]="mensajeFinal.includes('Ganaste')"
+    [class.alert-danger]="mensajeFinal.includes('Sin intentos')"
+  >
+    {{ mensajeFinal }}
+    <button class="btn btn-primary ms-3" (click)="iniciarJuego()">Jugar de nuevo</button>
+  </div>
+
+  <!-- Mensaje si el juego no inició -->
+  <div *ngIf="!juegoIniciado" class="text-center text-muted fs-5 py-5">
+    Presioná <strong>INICIAR</strong> para comenzar el juego.
+  </div>
+
+  <!-- Tablero de cartas -->
+  <div class="tablero mx-auto" *ngIf="juegoIniciado">
+    <div
+      class="carta"
+      *ngFor="let carta of tablero"
+      [class.revelada]="carta.revelada || carta.encontrada"
+      [class.encontrada]="carta.encontrada"
+      [class.bloqueada]="carta.encontrada || bloqueado"
+      (click)="clickCarta(carta)"
+    >
+      <div class="carta-inner">
+        <!-- Cara trasera (tapada) -->
+        <div class="carta-back">❓</div>
+        <!-- Cara delantera (revelada) -->
+        <div class="carta-front">{{ carta.emoji }}</div>
+      </div>
+    </div>
+  </div>
+
+</div>

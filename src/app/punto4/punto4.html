@@ -1,0 +1,202 @@
+<div class="container mt-4">
+  <h2 class="text-center mb-4">🎓 Inscripción a Cursos</h2>
+
+  <!-- ===== FORMULARIO ===== -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Nueva Inscripción</h5>
+    </div>
+    <div class="card-body">
+
+      <!-- Mensaje de éxito -->
+      <div *ngIf="mensajeExito" class="alert alert-success">{{ mensajeExito }}</div>
+
+      <div class="row g-3">
+
+        <!-- DNI -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">DNI</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="formData.dni"
+            placeholder="Ej: 38123456"
+          />
+        </div>
+
+        <!-- Email -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Email</label>
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="formData.email"
+            placeholder="alumno@email.com"
+          />
+        </div>
+
+        <!-- Curso -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Curso</label>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="formData.curso"
+            placeholder="Ej: Programación Web"
+          />
+        </div>
+
+        <!-- Fecha -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Fecha de Inscripción</label>
+          <input
+            type="date"
+            class="form-control"
+            [(ngModel)]="formData.fechaInscripcion"
+          />
+        </div>
+
+        <!-- Precio base -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Precio del Curso ($)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="formData.precio"
+            (ngModelChange)="calcularPrecio()"
+            placeholder="Ej: 5000"
+            min="0"
+          />
+        </div>
+
+        <!-- Categoría alumno -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Categoría de Alumno</label>
+          <select
+            class="form-select"
+            [(ngModel)]="formData.categoriaAlumno"
+            (ngModelChange)="calcularPrecio()"
+          >
+            <option [ngValue]="null" disabled>-- Seleccionar --</option>
+            <option [ngValue]="1">Estudiante (35% descuento)</option>
+            <option [ngValue]="2">Egresado (50% descuento)</option>
+            <option [ngValue]="3">Particular (sin descuento)</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Precio final: se muestra solo si precio Y categoría están ingresados (ngIf) -->
+      <div
+        *ngIf="precioFinal !== null"
+        class="mt-4 p-3 bg-light border rounded d-flex justify-content-between align-items-center"
+      >
+        <div>
+          <span class="text-muted">Descuento aplicado: </span>
+          <strong class="text-warning">{{ getDescuento() }}</strong>
+        </div>
+        <div>
+          <label class="form-label fw-bold mb-0 me-2">💰 Total a abonar:</label>
+          <span class="fs-4 fw-bold text-success">
+            {{ precioFinal | currency:'$':'symbol':'1.2-2' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Botón registrar -->
+      <div class="mt-4 text-end">
+        <button
+          class="btn btn-primary btn-lg"
+          (click)="registrar()"
+          [disabled]="!formularioValido"
+        >
+          📋 REGISTRAR
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== LISTA DE INSCRIPCIONES ===== -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between">
+      <h5 class="mb-0">📋 Inscripciones Registradas</h5>
+      <span class="badge bg-light text-dark fs-6">{{ inscripciones.length }} registros</span>
+    </div>
+    <div class="card-body p-0">
+
+      <div *ngIf="inscripciones.length === 0" class="text-center text-muted py-4">
+        No hay inscripciones registradas aún.
+      </div>
+
+      <div class="table-responsive" *ngIf="inscripciones.length > 0">
+        <table class="table table-striped table-hover mb-0">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>DNI</th>
+              <th>Email</th>
+              <th>Curso</th>
+              <th>Categoría</th>
+              <th>Fecha</th>
+              <th>Precio Base</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ins of inscripciones">
+              <td>{{ ins.id }}</td>
+              <td>{{ ins.dni }}</td>
+              <td>{{ ins.email }}</td>
+              <td>{{ ins.curso }}</td>
+              <td>
+                <span class="badge"
+                  [class.bg-info]="ins.categoriaAlumno === 1"
+                  [class.bg-warning]="ins.categoriaAlumno === 2"
+                  [class.bg-secondary]="ins.categoriaAlumno === 3"
+                >
+                  {{ getNombreCategoria(ins.categoriaAlumno) }}
+                </span>
+              </td>
+              <!-- Pipe de fecha -->
+              <td>{{ ins.fechaInscripcion | date:'dd/MM/yyyy' }}</td>
+              <!-- Pipe de moneda -->
+              <td>{{ ins.precio | currency:'$':'symbol':'1.2-2' }}</td>
+              <td><strong class="text-success">{{ ins.precioFinal | currency:'$':'symbol':'1.2-2' }}</strong></td>
+              <td>
+                <button class="btn btn-sm btn-outline-danger" (click)="eliminar(ins.id)">🗑</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESUMEN POR CATEGORÍA ===== -->
+  <div class="card shadow-sm mb-5" *ngIf="inscripciones.length > 0">
+    <div class="card-header bg-info text-white">
+      <h5 class="mb-0">📊 Resumen por Categoría</h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4" *ngFor="let res of resumen">
+          <div class="card text-center border-0 bg-light mb-3">
+            <div class="card-body">
+              <h6 class="card-title">{{ res.nombre }}</h6>
+              <p class="mb-1">Cantidad: <strong>{{ res.cantidad }}</strong></p>
+              <p class="mb-0 text-success fw-bold">{{ res.total | currency:'$':'symbol':'1.2-2' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Total general -->
+      <div class="text-end border-top pt-3">
+        <span class="fs-5">Total General: </span>
+        <strong class="fs-4 text-success">{{ totalGeneral | currency:'$':'symbol':'1.2-2' }}</strong>
+      </div>
+    </div>
+  </div>
+
+</div>

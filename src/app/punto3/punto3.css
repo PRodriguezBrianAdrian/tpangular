@@ -1,0 +1,75 @@
+/* Tablero: grilla de 4 columnas */
+.tablero {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 520px;
+}
+
+/* Carta contenedor */
+.carta {
+  width: 110px;
+  height: 110px;
+  perspective: 600px;
+  cursor: pointer;
+}
+
+/* Animación 3D flip */
+.carta-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+  border-radius: 12px;
+}
+
+/* Cuando está revelada: gira */
+.carta.revelada .carta-inner {
+  transform: rotateY(180deg);
+}
+
+/* Cara trasera y delantera comparten estilos base */
+.carta-back,
+.carta-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Cara tapada: azul */
+.carta-back {
+  background: linear-gradient(135deg, #1e3c72, #2a69ac);
+  color: white;
+}
+
+/* Cara revelada: blanca */
+.carta-front {
+  background: #fff;
+  transform: rotateY(180deg);
+  border: 2px solid #dee2e6;
+}
+
+/* Carta encontrada: verde */
+.carta.encontrada .carta-front {
+  background: #d4edda;
+  border-color: #28a745;
+}
+
+/* Carta bloqueada: sin cursor */
+.carta.bloqueada {
+  cursor: default;
+}
+
+/* Hover solo en cartas no encontradas */
+.carta:not(.encontrada):not(.bloqueada):hover .carta-inner {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
